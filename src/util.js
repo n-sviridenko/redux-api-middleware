@@ -39,7 +39,7 @@ function normalizeTypeDescriptors(types) {
     successType = { type: successType };
   }
   successType = {
-    payload: (action, state, res) => getJSON(res),
+    payload: (action, dispatch, state, res) => getJSON(res),
     ...successType
   };
 
@@ -47,7 +47,7 @@ function normalizeTypeDescriptors(types) {
     failureType = { type: failureType };
   }
   failureType = {
-    payload: (action, state, res) =>
+    payload: (action, dispatch, state, res) =>
       getJSON(res).then(
         (json) => new ApiError(res.status, res.statusText, json)
       ),
