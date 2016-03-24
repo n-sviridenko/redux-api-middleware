@@ -12,7 +12,7 @@ import { getJSON, normalizeTypeDescriptors, actionWith } from './util';
  * @type {ReduxMiddleware}
  * @access public
  */
-function apiMiddleware({ getState }) {
+function apiMiddleware({ dispatch, getState }) {
   return (next) => async (action) => {
     // Do not process actions without a [CALL_API] property
     if (!isRSAA(action)) {
@@ -56,7 +56,7 @@ function apiMiddleware({ getState }) {
           payload: new RequestError('[CALL_API].bailout function failed'),
           error: true
         },
-        [action, getState()]
+        [action, dispatch, getState()]
       ));
     }
 
@@ -71,7 +71,7 @@ function apiMiddleware({ getState }) {
             payload: new RequestError('[CALL_API].endpoint function failed'),
             error: true
           },
-          [action, getState()]
+          [action, dispatch, getState()]
         ));
       }
     }
@@ -87,7 +87,7 @@ function apiMiddleware({ getState }) {
             payload: new RequestError('[CALL_API].headers function failed'),
             error: true
           },
-          [action, getState()]
+          [action, dispatch, getState()]
         ));
       }
     }
@@ -95,7 +95,7 @@ function apiMiddleware({ getState }) {
     // We can now dispatch the request FSA
     next(await actionWith(
       requestType,
-      [action, getState()]
+      [action, dispatch, getState()]
     ));
 
     try {
@@ -109,7 +109,7 @@ function apiMiddleware({ getState }) {
           payload: new RequestError(e.message),
           error: true
         },
-        [action, getState()]
+        [action, dispatch, getState()]
       ));
     }
 
@@ -117,7 +117,7 @@ function apiMiddleware({ getState }) {
     if (res.ok) {
       return next(await actionWith(
         successType,
-        [action, getState(), res]
+        [action, dispatch, getState(), res]
       ));
     } else {
       return next(await actionWith(
@@ -125,7 +125,7 @@ function apiMiddleware({ getState }) {
           ...failureType,
           error: true
         },
-        [action, getState(), res]
+        [action, dispatch, getState(), res]
       ));
     }
   }
